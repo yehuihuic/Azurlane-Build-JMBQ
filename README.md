@@ -86,7 +86,3 @@
 2. [n0k0m3/PerseusCI](https://github.com/n0k0m3/PerseusCI)
 3. [L-JINBIN/MTDataFilesProvider](https://github.com/L-JINBIN/MTDataFilesProvider)
 ---
-
-## 📊 Star历史
-
-[![Star History Chart](https://starchart.cc/Chtholly344/Azurlane-Build.svg?variant=adaptive)](https://starchart.cc/Chtholly344/Azurlane-Build)

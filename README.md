@@ -50,6 +50,24 @@
 </div>
 
 ---
+## 📦 构建教程（GitHub Actions）
+
+使用 GitHub Actions 构建，**零本地环境，强烈推荐**。
+
+### 国服（B站/小米/应用宝等）— 使用 APK 工作流
+
+1. 从官方渠道下载对应区服 APK，上传到能取稳定直链的网盘（推荐[钛盘](https://tmp.link)或 Google Drive），拿到直链 URL。
+2. 仓库 → **Actions** → 选择 **APK AzurLane JMBQ Build Work** → **Run workflow** → 输入区服名（纯英文，如 `Bilibili`）+ APK 直链。
+
+### 国际服（TW/EN/JP/KR）— 使用 XAPK 工作流
+
+1. 仓库 → **Actions** → 选择 **XAPK AzurLane JMBQ Build Work** → 选择区服（自动使用 `apkeep` 从 Google Play 下载 XAPK，无需手动提供链接）。
+
+### 获取产物
+
+等待 5-10 分钟，构建成功后在仓库 **Releases** 页下载产物（7z 分卷包，解压即得 APK/XAPK）。
+
+---
 ## 项目目录
 ```
 

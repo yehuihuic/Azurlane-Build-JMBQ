@@ -115,49 +115,50 @@ DOWNLOAD_APKTOOL() {
     fi
 }
 
-# 下载 Mod Patch 文件并解压
+# 从本仓库 AL_Mod_Maker 目录反编译 MOD APK 并提取补丁文件
 DOWNLOAD_MOD_MENU() {
-    local OWNER="JMBQ01"
-    local REPO="azurlan"
-    local FILENAME="MOD_MENU.rar"
+    local MOD_APK_DIR="${DOWNLOAD_DIR}/AL_Mod_Maker"
 
-    echo "正在下载MOD补丁..."
-    local API_RESPONSE=$(curl -s "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest")
-    local JMBQ_VERSION=$(echo "${API_RESPONSE}" | jq -r '.tag_name')
+    echo "正在查找 MOD APK 文件..."
+    local MOD_APK=$(find "${MOD_APK_DIR}" -name "*.apk" -type f | head -1)
 
-    # 修改：查找name中含有.rar的文件，而不是直接使用第一个assets
-    local DOWNLOAD_LINK=$(echo "${API_RESPONSE}" | jq -r '.assets[] | select(.name | contains(".rar")) | .browser_download_url' | head -n 1)
-
-    if [ -z "${DOWNLOAD_LINK}" ] || [ "${DOWNLOAD_LINK}" == "null" ]; then
-        # 修改：查找name中含有.zip的文件，避免后缀不一致导致的无法获取链接
-        local FILENAME="MOD_MENU.zip"
-        local DOWNLOAD_LINK=$(echo "${API_RESPONSE}" | jq -r '.assets[] | select(.name | contains(".zip")) | .browser_download_url' | head -n 1)
-        if [ -z "${DOWNLOAD_LINK}" ] || [ "${DOWNLOAD_LINK}" == "null" ]; then
-            echo "无法获取MOD Patch文件下载链接"
-            exit 1
-        fi
-    fi
-
-    curl -L -o "${DOWNLOAD_DIR}/${FILENAME}" "${DOWNLOAD_LINK}"
-    if [ $? -eq 0 ]; then
-        echo "补丁下载成功！文件保存至：${DOWNLOAD_DIR}/${FILENAME}"
-    else
-        echo "补丁下载失败，请重试"
+    if [ -z "${MOD_APK}" ]; then
+        echo "错误: 未找到 MOD APK 文件！请确保 AL_Mod_Maker 目录下存在 APK 文件"
         exit 1
     fi
 
-    if command -v 7z &> /dev/null; then
-        7z x -y "${DOWNLOAD_DIR}/${FILENAME}" -o"${DOWNLOAD_DIR}/JMBQ"
-    else
-        echo "错误: 未找到7z工具，无法解压！"
-        exit 1
+    echo "找到 MOD APK: ${MOD_APK}"
+
+    # 从文件名提取版本号（如 AL_Mod_Maker_3.2.1.apk → 3.2.1）
+    local MOD_FILENAME=$(basename "${MOD_APK}")
+    JMBQ_VERSION=$(echo "${MOD_FILENAME}" | grep -oP '\d+\.\d+\.\d+' | head -1)
+    if [ -z "${JMBQ_VERSION}" ]; then
+        JMBQ_VERSION="unknown"
     fi
-    
+    echo "MOD 版本: ${JMBQ_VERSION}"
+
+    # 用 apktool 反编译 MOD APK 到 JMBQ 目录
+    echo "正在反编译 MOD APK..."
+    java -jar "${DOWNLOAD_DIR}/apktool.jar" d -f "${MOD_APK}" -o "${DOWNLOAD_DIR}/JMBQ"
     if [ $? -ne 0 ]; then
-        echo "错误: 解压 ${FILENAME} 失败！"
+        echo "错误: MOD APK 反编译失败！"
         exit 1
     fi
-    echo "JMBQ目录内容:"  
+    echo "MOD APK 反编译完成"
+
+    # 合并所有 smali 目录到 smali_classes（兼容 PATCH_APK 的查找逻辑）
+    # apktool 反编译后可能生成 smali、smali_classes2 等目录，
+    # 但 PATCH_APK 中 find 查找的是 smali_classes* 模式，不匹配 smali 目录
+    local SMALI_MERGED="${DOWNLOAD_DIR}/JMBQ/smali_classes"
+    mkdir -p "${SMALI_MERGED}"
+    for dir in "${DOWNLOAD_DIR}/JMBQ"/smali "${DOWNLOAD_DIR}/JMBQ"/smali_classes[0-9]*; do
+        if [ -d "$dir" ]; then
+            cp -rn "$dir/." "${SMALI_MERGED}/"
+            rm -rf "$dir"
+        fi
+    done
+
+    echo "JMBQ目录内容:"
     ls -la "${DOWNLOAD_DIR}/JMBQ" 2>/dev/null || echo "无法列出目录内容"
 
     echo "JMBQ_VERSION=${JMBQ_VERSION}" >> "${GITHUB_ENV}"

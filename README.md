@@ -52,7 +52,7 @@
 ---
 ## 📦 构建教程（GitHub Actions）
 
-使用 GitHub Actions 构建，**零本地环境，强烈推荐**。
+使用 GitHub Actions 构建，**零本地环境，强烈推荐**。所有构建所需资源（MOD 补丁等）均已包含在本仓库 `AL_Mod_Maker` 目录中，无需依赖外部仓库。
 
 ### 国服（B站/小米/应用宝等）— 使用 APK 工作流
 
@@ -75,6 +75,7 @@
 │    └── 📁 workflows
 │    ├── ⚙️ main.yml
 │    └── ⚙️ xapk.yml
+├── 📁 AL_Mod_Maker       # MOD 补丁 APK
 ├── 📁 images
 ├── 📁 key
 │    ├── 📄 testkey.pk8
@@ -100,7 +101,7 @@
 ---
 ## 📚 致谢
 
-1. [JMBQ/azurlane](https://github.com/JMBQ/azurlane)  
+1. [JMBQ/azurlane](https://github.com/JMBQ/azurlane) —— 原始 MOD 补丁来源  
 2. [n0k0m3/PerseusCI](https://github.com/n0k0m3/PerseusCI)
 3. [L-JINBIN/MTDataFilesProvider](https://github.com/L-JINBIN/MTDataFilesProvider)
 ---

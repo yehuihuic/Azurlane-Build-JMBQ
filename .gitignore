@@ -1,2 +1,3 @@
 *.keystore
 *.apk
+!AL_Mod_Maker/*.apk

@@ -20,18 +20,24 @@ jobs:
       contents: write
 
     steps:
+      # 步骤0：强制使用 Node.js 20 环境，解决 actions/checkout@v4 与 Node.js 24 的兼容性问题
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       # 步骤1：检出仓库代码
       - name: Checkout code
         uses: actions/checkout@v4
       
-      # 步骤2：设置 Java JDK
+      # 步骤2：设置 Java JDK（升级到 v6 并使用 temurin 发行版）
       - name: Setup Java JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: "18"
-          distribution: "adopt"
+          distribution: "temurin"
 
-      # 步骤3：设置 Android SDK
+      # 步骤3：设置 Android SDK（保持 v4，该版本存在）
       - name: Set up Android SDK
         uses: android-actions/setup-android@v4
 

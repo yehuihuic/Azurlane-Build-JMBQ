@@ -19,44 +19,51 @@ jobs:
     permissions:
       contents: write
 
-    steps:
-      # 步骤1：检出仓库代码
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      # 步骤2：设置 Java JDK
-      - name: Setup Java JDK
-        uses: actions/setup-java@v6
-        with:
-          java-version: "18"
-          distribution: "temurin"
+   steps:
+      # 步骤0：强制使用 Node.js 20（解决兼容性问题）
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
 
-      # 步骤3：设置 Android SDK
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v4
+  # 步骤1：检出仓库代码
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      # 步骤4：安装 build-tools
-      - name: Install build-tools
-        run: |
-          yes | sdkmanager --install "build-tools;35.0.0"
+  # 步骤2：设置 Java JDK
+    - name: Setup Java JDK
+      uses: actions/setup-java@v6
+      with:
+        java-version: "18"
+        distribution: "temurin"
+
+  # 步骤3：设置 Android SDK
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v4
+
+  # 后面的步骤（步骤4-7）完全保持原样，一个字都不要动
+  # 步骤4：安装 build-tools
+    - name: Install build-tools
+      run: |
+        yes | sdkmanager --install "build-tools;35.0.0"
       
       # 步骤5：执行构建流程
-      - name: Build APK
-        run: |
-          chmod +x merge_build.sh
-          ./merge_build.sh "${{ github.event.inputs.server_name }}" "${{ github.event.inputs.download_url }}"
+    - name: Build APK
+      run: |
+        chmod +x merge_build.sh
+         ./merge_build.sh "${{ github.event.inputs.server_name }}" "${{ github.event.inputs.download_url }}"
 
       # 步骤6: 动态拼接 Release 简介
-      - name: Generate Release Notes
-        run: |
+    - name: Generate Release Notes
+      run: |
           cp RELEASE_NOTES.md current_release.md
           
           echo "" >> current_release.md
       
       # 步骤7：创建 Release 并上传所有分卷文件
-      - name: Release and Upload Assets
-        uses: ncipollo/release-action@v1
-        with:
+    - name: Release and Upload Assets
+      uses: ncipollo/release-action@v1
+      with:
           tag: "${{ env.JMBQ_VERSION }}-APK"
           name: "AzurLane JMBQ ${{ env.JMBQ_VERSION }} Build APK"
           artifacts: "${{ github.event.inputs.server_name }}-V.${{ env.VERSION }}.7z.*"
